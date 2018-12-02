@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" 
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans  
+           http://www.springframework.org/schema/beans/spring-beans.xsd 
+           http://www.springframework.org/schema/context  
+			http://www.springframework.org/schema/context/spring-context.xsd
+           http://cxf.apache.org/jaxws 
+           http://cxf.apache.org/schemas/jaxws.xsd 
+           ">
+	
+	<context:annotation-config />
+	<context:component-scan base-package="cch.importTool" />
+	<context:property-placeholder location="classpath:config.properties"/>
+	<!-- shiro -->
+	
+	<!-- shiro -->
+	<!-- -->
+	<bean id="applicationContext" class="cch.importTool.utils.ApplicationContextUtil"></bean> 
+	<!---->
+	<bean id="config" class="cch.importTool.utils.Config">  
+		<property name="tempPath" value="${tempPath}" />  
+		<property name="logPath" value="${logPath}" />
+    </bean> 
+    
+	<bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">  
+		<property name="driverClassName" value="${jdbc.driver}" />  
+		<property name="url" value="${jdbc.url}" />  
+		<property name="username" value="${jdbc.username}" />  
+		<property name="password" value="${jdbc.password}" />
+		<property name="testOnBorrow" value="true"/>
+		<property name="validationQuery" value="/* ping */"/>
+		
+    </bean> 
+	<bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="typeAliasesPackage" value="cch.importTool.model" />
+	</bean>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+  		<property name="basePackage" value="cch.importTool.dao" />
+	</bean> 
+	<bean class="cch.importTool.init.InitDisruptor" scope="singleton"  init-method="init"></bean> 
+</beans>
